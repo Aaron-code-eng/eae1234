@@ -62,6 +62,17 @@ export const COMMANDS = [
     },
   },
   {
+    name: 'cam',
+    usage: '/cam <chase|hood|top>',
+    desc: 'Switch the 3D camera view.',
+    run: (ctx, args) => {
+      const mode = String(args[0] ?? '').toLowerCase();
+      if (!mode) return { ok: false, message: 'Options: chase, hood, top.' };
+      if (!ctx.game.renderer.setCamera(mode)) return { ok: false, message: `Unknown camera '${mode}'. Options: chase, hood, top.` };
+      return { ok: true, message: `Camera set to ${mode}.` };
+    },
+  },
+  {
     name: 'cars',
     usage: '/cars',
     desc: 'List active cars and their ids.',

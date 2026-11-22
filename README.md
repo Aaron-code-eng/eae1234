@@ -1,11 +1,14 @@
 # apex-drift
 
-A top-down arcade racing game built entirely with the **Canvas 2D API**. No WebGL, no frameworks, no build step, no npm dependencies — just HTML, CSS and ES modules.
+An arcade racing game with a **hand-written software 3D renderer on top of the Canvas 2D API**. No WebGL, no frameworks, no build step, no npm dependencies — just HTML, CSS and ES modules.
 
-Race against AI on three circuits, drift for score, earned credits buy new cars and upgrades, and tune everything live from the admin console.
+Meshes, road strips and particles are projected, near-plane clipped, depth-sorted and flat-shaded in JavaScript, then filled as ordinary 2D polygons. The underlying car physics still runs on a flat x/z plane, so driving feels exactly like the original top-down game while the view is fully 3D.
+
+Race against AI on three circuits, drift for score, spend earned credits on new cars and upgrades, switch chase/hood/top cameras, and tune everything live from the admin console.
 
 ## Features
 
+- **Software 3D** — perspective chase camera (plus hood and top views), near-plane clipping, painter's-algorithm depth sorting, low-poly car meshes with flat shading, 3D curbs, checkered start line, skid marks and particle sprites. Pure Canvas 2D; no WebGL context is ever created.
 - **Driving & drifting** — weighty arcade physics with lateral grip, handbrake slides, self-aligning torque, nitro, off-road penalties and skid marks.
 - **Crashing physics** — car-to-car impulses with mass, wall reflection, impact damage, sparks, smoke and camera shake. Damage reduces engine power.
 - **Racing** — ordered checkpoints, lap timing, best laps, position standings, AI opponents with per-driver skill, and credit rewards based on position, time and drift score.
@@ -35,6 +38,7 @@ Open <http://localhost:8080> in any modern browser. There is no install step —
 | `Space` | Handbrake (drift) |
 | `Shift` | Nitro |
 | `R` | Reset car to the racing line |
+| `C` | Cycle camera: chase → hood → top |
 | `Esc` | Pause / resume |
 | `` ` `` or `F1` | Toggle admin console |
 
@@ -54,6 +58,7 @@ Press `` ` `` (or `F1`) and type a command. Every command starts with `/`; `/hel
 | `/credits <amount>` | Add or remove credits |
 | `/car <id>` | Swap player car (`starter`, `drift`, `racecar`, `rally`, `hyper`) |
 | `/cars` | List active cars and ids |
+| `/cam <chase\|hood\|top>` | Switch the 3D camera |
 | `/spawn <id> [x] [y]` | Spawn an AI car |
 | `/kick <carId>` | Remove a car |
 | `/tp <x> <y>` / `/tp cp <n>` | Teleport player |
@@ -83,22 +88,21 @@ src/core/             Input, math, events, profile storage, Game orchestrator
 src/entities/         Car physics and car catalogue
 src/world/            Track spline/collisions and track definitions
 src/systems/          Physics, AI, race rules, upgrades, particles, admin commands
-src/render/           2D renderer, camera and HUD
+src/render/           Software 3D renderer, 3D math, 2D minimap and HUD
 src/ui/               Screen routing, garage and console UI
 tests/logic.test.js   DOM-free logic tests
+tests/render3d.test.js Projection, clipping and camera tests
 ```
 
-## Publishing to GitHub
+## GitHub
 
-This folder is already a git repository with an initial commit. To publish it:
+Published at <https://github.com/Aaron-code-eng/eae1234> on the `main` branch. To get the latest version:
 
 ```bash
-git remote add origin https://github.com/<your-username>/apex-drift.git
-git branch -M main
-git push -u origin main
+git clone https://github.com/Aaron-code-eng/eae1234.git
+cd eae1234
+npm start
 ```
-
-Create the empty `apex-drift` repository on GitHub first (do not add a README there, or pull before pushing).
 
 ## License
 

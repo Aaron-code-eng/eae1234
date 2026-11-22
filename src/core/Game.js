@@ -14,7 +14,7 @@ import { ParticleSystem, SkidMarks } from '../systems/ParticleSystem.js';
 import { AdminSystem } from '../systems/AdminSystem.js';
 import { buyUpgrade, computeStats } from '../systems/UpgradeSystem.js';
 import { Camera } from '../render/Camera.js';
-import { Renderer } from '../render/Renderer.js';
+import { Renderer3D } from '../render/Renderer3D.js';
 import { HUD } from '../render/HUD.js';
 import { UI } from '../ui/UI.js';
 
@@ -23,7 +23,7 @@ const AI_TYPES = ['racecar', 'drift', 'rally', 'starter', 'hyper'];
 
 export class Game {
   constructor({ canvas, storage } = {}) {
-    this.renderer = new Renderer(canvas);
+    this.renderer = new Renderer3D(canvas);
     this.hud = new HUD();
     this.input = new Input();
     this.profileStore = new ProfileStore(storage);
@@ -73,6 +73,7 @@ export class Game {
 
     const grid = this.track.gridPosition(0);
     this.camera.snapTo(grid.x, grid.y);
+    this.renderer.snapCamera();
   }
 
   createCar({ typeId, isPlayer = false, slot = 0, x, y, angle }) {
@@ -155,6 +156,7 @@ export class Game {
   loop = (timestamp) => {
     const elapsed = this.lastTime ? Math.min((timestamp - this.lastTime) / 1000, 0.05) : 0;
     this.lastTime = timestamp;
+    this.frameDt = elapsed;
     this.frames++;
     this.fpsTime += elapsed;
     if (this.fpsTime >= 0.5) {
@@ -188,6 +190,11 @@ export class Game {
     if (this.input.consumePress('KeyR')) {
       this.player.respawn(this.track);
       this.toast('Car reset');
+    }
+
+    if (this.input.consumePress('KeyC')) {
+      this.renderer.cycleCamera();
+      this.toast(`Camera: ${this.renderer.cameraMode}`);
     }
 
     if (this.race.state !== 'countdown' && this.race.state !== 'finished') {

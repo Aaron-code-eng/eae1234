@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "A dependency-free, Canvas 2D top-down racing game with drifting, upgrades, racing and admin commands. No WebGL.",
+  "description": "A dependency-free arcade racing game with a software 3D renderer on Canvas 2D, drifting, upgrades, racing and admin commands. No WebGL.",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
