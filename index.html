@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="apex-drift - a dependency-free Canvas 2D racing game. No WebGL required." />
+  <title>apex-drift</title>
+  <link rel="stylesheet" href="./styles/main.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="game" aria-label="Racing game viewport"></canvas>
+
+    <!-- ================= IN-GAME HUD ================= -->
+    <div id="hud" class="hud hidden">
+      <div class="hud-corner hud-tl">
+        <div class="panel">
+          <div class="label">LAP <strong id="hud-lap">0/3</strong></div>
+          <div class="label">POS <strong id="hud-pos">1/5</strong></div>
+          <div class="timer" id="hud-time">00:00.00</div>
+          <div class="label subtle">BEST <span id="hud-best">--:--.--</span></div>
+        </div>
+        <div class="panel standings"><div id="hud-standings"></div></div>
+      </div>
+
+      <div class="hud-corner hud-tr">
+        <canvas id="minimap" width="240" height="170" aria-label="Minimap"></canvas>
+        <div class="panel mini-panel">
+          <div class="label">CREDITS <strong id="hud-credits">0</strong></div>
+          <div class="label hidden" id="hud-fps">60 FPS</div>
+          <div class="label subtle" id="hud-mode">RACE</div>
+        </div>
+      </div>
+
+      <div class="hud-corner hud-bl">
+        <div class="panel dash-panel">
+          <div class="car-name" id="hud-car-name">Street 240</div>
+          <div class="speed-row"><span id="hud-speed">0</span><small>KM/H</small><span class="gear" id="hud-gear">N</span></div>
+          <div class="meter"><div class="meter-fill rpm" id="hud-rpm-fill"></div></div>
+          <div class="meter-label">NITRO <span id="hud-nitro-label">100%</span></div>
+          <div class="meter"><div class="meter-fill nitro" id="hud-nitro-fill"></div></div>
+          <div class="meter-label">DAMAGE <span id="hud-damage-label">0%</span></div>
+          <div class="meter"><div class="meter-fill damage" id="hud-damage-fill"></div></div>
+        </div>
+      </div>
+
+      <div class="hud-corner hud-br">
+        <div class="panel drift-panel">
+          <div class="label">DRIFT SCORE</div>
+          <div class="drift-score" id="hud-drift">0</div>
+          <div class="drift-mult" id="hud-drift-mult">x1.0</div>
+        </div>
+        <div class="hint">WASD drive · SPACE drift · SHIFT nitro · R reset · ESC pause · ` admin</div>
+      </div>
+
+      <div class="hud-center hidden" id="hud-center"></div>
+    </div>
+
+    <!-- ================= MAIN MENU ================= -->
+    <section id="screen-menu" class="screen">
+      <div class="menu-card">
+        <div class="brand">
+          <h1>APEX<span>DRIFT</span></h1>
+          <p>Canvas 2D racing · no WebGL · no dependencies</p>
+        </div>
+
+        <div class="menu-grid">
+          <div class="menu-main">
+            <button class="btn primary" id="btn-race">RACE</button>
+            <button class="btn" id="btn-free">FREE ROAM</button>
+            <button class="btn" id="btn-garage">GARAGE</button>
+            <button class="btn" id="btn-settings">SETTINGS</button>
+          </div>
+
+          <div class="menu-setup panel">
+            <label>TRACK
+              <select id="menu-track"></select>
+            </label>
+            <label>LAPS
+              <select id="menu-laps">
+                <option value="1">1 lap</option>
+                <option value="3" selected>3 laps</option>
+                <option value="5">5 laps</option>
+              </select>
+            </label>
+            <label>OPPONENTS
+              <select id="menu-ai">
+                <option value="0">None</option>
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="5">5</option>
+                <option value="7">7</option>
+              </select>
+            </label>
+            <div class="credits-line">CREDITS <strong id="menu-credits">0</strong></div>
+          </div>
+        </div>
+
+        <p class="footnote">Controls: WASD / arrows · Space handbrake · Shift nitro · R reset · ` admin console</p>
+      </div>
+    </section>
+
+    <!-- ================= GARAGE ================= -->
+    <section id="screen-garage" class="screen hidden">
+      <div class="wide-card">
+        <header><h2>GARAGE</h2><div>CREDITS <strong id="garage-credits">0</strong></div></header>
+        <div class="garage-body">
+          <div class="car-list" id="garage-list"></div>
+          <div class="car-detail">
+            <div id="garage-stats" class="panel"></div>
+            <h3>UPGRADES</h3>
+            <div id="garage-upgrades" class="upgrade-list"></div>
+          </div>
+        </div>
+        <footer><button class="btn" id="garage-back">BACK</button></footer>
+      </div>
+    </section>
+
+    <!-- ================= SETTINGS ================= -->
+    <section id="screen-settings" class="screen hidden">
+      <div class="menu-card narrow">
+        <h2>SETTINGS</h2>
+        <div class="settings-list">
+          <label>Default laps
+            <select id="set-laps"><option>1</option><option>3</option><option>5</option></select>
+          </label>
+          <label>Default opponents
+            <select id="set-ai"><option>0</option><option>2</option><option>3</option><option>5</option><option>7</option></select>
+          </label>
+          <label>Difficulty
+            <select id="set-difficulty"><option value="0.82">Chill</option><option value="0.92" selected>Normal</option><option value="1.02">Quick</option><option value="1.12">Unfair</option></select>
+          </label>
+          <label class="check"><input type="checkbox" id="set-minimap" checked /> Show minimap</label>
+          <label class="check"><input type="checkbox" id="set-fps" /> Show FPS</label>
+        </div>
+        <button class="btn" id="settings-back">BACK</button>
+      </div>
+    </section>
+
+    <!-- ================= PAUSE ================= -->
+    <section id="screen-pause" class="screen hidden overlay">
+      <div class="menu-card narrow center">
+        <h2>PAUSED</h2>
+        <button class="btn primary" id="pause-resume">RESUME</button>
+        <button class="btn" id="pause-restart">RESTART RACE</button>
+        <button class="btn" id="pause-menu">MAIN MENU</button>
+      </div>
+    </section>
+
+    <!-- ================= RESULTS ================= -->
+    <section id="screen-results" class="screen hidden overlay">
+      <div class="menu-card">
+        <h2 id="results-title">RACE COMPLETE</h2>
+        <div id="results-rows" class="results-rows"></div>
+        <div class="results-actions">
+          <button class="btn primary" id="results-retry">RACE AGAIN</button>
+          <button class="btn" id="results-continue">MAIN MENU</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ADMIN CONSOLE ================= -->
+    <div id="console" class="console hidden">
+      <header><span>ADMIN CONSOLE</span><button id="console-close" aria-label="Close console">×</button></header>
+      <pre id="console-output"></pre>
+      <div class="console-input-row"><span>&gt;</span><input id="console-input" type="text" autocomplete="off" spellcheck="false" placeholder="/help" /></div>
+    </div>
+
+    <div id="toasts" class="toasts" aria-live="polite"></div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
